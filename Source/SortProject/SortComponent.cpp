@@ -26,35 +26,21 @@ void USortComponent::InitArray(UPARAM(ref) TArray<ASortingBox*>& a)
 	ArrayOfObjects = a;
 }
 
-struct BoxStruct
+struct BoxPackage: public IComparable
 {
-	ASortingBox* SortingBox;
-
-	BoxStruct()
+	ASortingBox* Box;
+	BoxPackage()
 	{
-		SortingBox = nullptr;
+		Box = nullptr;
+	}
+	BoxPackage(ASortingBox* Box)
+	{
+		this->Box = Box;
 	}
 
-	BoxStruct(ASortingBox* Box)
+	virtual float Compare(IComparable& Other) override
 	{
-		SortingBox = Box;
-	}
-		
-	bool operator != (BoxStruct& Box) const
-	{
-		return SortingBox->BoxNumber != Box.SortingBox->BoxNumber;
-	}
-	bool operator == (BoxStruct& Box) const
-	{
-		return SortingBox->BoxNumber == Box.SortingBox->BoxNumber;
-	}
-	bool operator < (BoxStruct& Box) const
-	{
-		return SortingBox->BoxNumber < Box.SortingBox->BoxNumber;
-	}
-	bool operator > (BoxStruct& Box) const
-	{
-		return SortingBox->BoxNumber > Box.SortingBox->BoxNumber;
+		return Box->Compare(*static_cast<BoxPackage&>(Other).Box);
 	}
 };
 
@@ -63,21 +49,20 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 	try
 	{
 		size_t Size = a.Num();
-		BoxStruct* Boxes = new BoxStruct[Size];
+		BoxPackage* Boxes = new BoxPackage[Size];
 		for (int i = 0; i < Size; ++i)
-			Boxes[i] = BoxStruct(a[i]);
-		CEqualityComparable
+			Boxes[i] = BoxPackage(a[i]);
 		
 		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- Before Sort --"));
 		for (int i = 0; i < Size; ++i)
 		{
 			auto message = FString("Array[")
 				.Append(FString::FromInt(i)).Append("] = ")
-				.Append(FString::FromInt(Boxes[i].SortingBox->BoxNumber));
+				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
 			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
 		}
 	
-		SortAlgorithm<BoxStruct>* alg = new MergeSort<BoxStruct>();
+		SortAlgorithm<BoxPackage>* alg = new MergeSort<BoxPackage>();
 		alg->Sort(Boxes, Size);
 
 		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- After Sort --"));
@@ -85,7 +70,7 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 		{
 			auto message = FString("Array[")
 				.Append(FString::FromInt(i)).Append("] = ")
-				.Append(FString::FromInt(Boxes[i].SortingBox->BoxNumber));
+				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
 			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
 		}
 	}

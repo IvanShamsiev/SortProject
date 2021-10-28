@@ -25,3 +25,8 @@ void ASortingBox::Tick(float DeltaTime)
 
 }
 
+float ASortingBox::Compare(IComparable& Other)
+{
+	return BoxNumber - static_cast<ASortingBox*>(&Other)->BoxNumber;
+}
+

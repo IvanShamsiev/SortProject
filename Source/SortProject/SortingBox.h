@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Comparable.h"
 #include "GameFramework/Actor.h"
 #include "SortingBox.generated.h"
 
 UCLASS()
-class SORTPROJECT_API ASortingBox : public AActor
+class SORTPROJECT_API ASortingBox : public AActor, public IComparable
 {
 	GENERATED_BODY()
 	
@@ -25,5 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
 	int BoxNumber;
+	
+	virtual float Compare(IComparable& Other) override;
 
 };
