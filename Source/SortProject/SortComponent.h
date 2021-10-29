@@ -24,16 +24,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Default")
 	void StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& a);
 
+	void UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray, UPARAM(ref) TArray<ASortingBox*>& SortedArray, TFunction<void()> OnFinish);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-	TArray<ASortingBox*> ArrayOfObjects;
+	TArray<ASortingBox*> ArrayForSorting;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 		
 };
