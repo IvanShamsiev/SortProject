@@ -7,6 +7,7 @@
 
 #include "SortingBox.h"
 #include "BoxWrapper.h"
+#include "MyTimerManager.h"
 #include "ModifiedSortAlgoritm/SortAlgorithm.h"
 #include "ModifiedSortAlgoritm/MergeSort.h"
 #include "ModifiedSortAlgoritm/MergeSort.cpp"
@@ -19,12 +20,17 @@ USortComponent::USortComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+	
+	//auto message = FString("OK!");
+	//GEngine->AddOnScreenDebugMessage(1, 999.f, FColor::Red, message);
 }
 
 void USortComponent::InitArray(UPARAM(ref) TArray<ASortingBox*>& a)
 {
 	ArrayForSorting = a;
 }
+
+
 
 void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& UnsortedArray)
 {
@@ -46,13 +52,15 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 		}
 	
 		SortAlgorithm<BoxWrapper>* alg = new MergeSort<BoxWrapper>();
-		alg->Sort(Boxes, Size, [this](BoxWrapper* sorted, size_t size, TFunction<void()> Proceed)
-		{
-			TArray<ASortingBox*> array;
-			for (int i = 0; i < size; ++i)
-				array.Add(sorted[i].Box);
-			UpdateSorting(this->ArrayForSorting, array, Proceed);
-		});
+		auto ProcessFunction = TFunction<void(BoxWrapper*, size_t, TFunction<void()>)>(
+			[this](BoxWrapper* sorted, size_t size, TFunction<void()> Proceed)
+			{
+				TArray<ASortingBox*> array;
+				for (int i = 0; i < size; ++i)
+					array.Add(sorted[i].Box);
+				UpdateSorting(this->ArrayForSorting, array, GetWorld()->GetTimerManager(), Proceed);
+			});
+		alg->Sort(Boxes, Size, ProcessFunction);
 
 		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- After Sort --"));
 		for (int i = 0; i < Size; ++i)
@@ -71,40 +79,14 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 	
 }
 
-struct MyTimerManager
-{
-	TArray<ASortingBox*>& UnsortedArray;
-	TArray<ASortingBox*>& SortedArray;
-	FTimerHandle h;
-	size_t size;
-	size_t i;
-
-	TFunction<void()> OnFinish;
-
-	MyTimerManager(TArray<ASortingBox*>& UArray,
-		TArray<ASortingBox*>& SArray,
-		TFunction<void()> OnFin): UnsortedArray(UArray), SortedArray(SArray), OnFinish(OnFin)
-	{
-		size = UArray.Num();
-		i = 0;
-	}
-
-	void Next()
-	{
-		if (i++ < size)
-		{
-			SortedArray[i]->SetActorLocation(UnsortedArray[i]->GetActorLocation());
-			FTimerManager::SetTimer(h, [this](){ Next(); }, 5.0f, false);
-		}
-	}
-};
 
 void USortComponent::UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray,
 	UPARAM(ref) TArray<ASortingBox*>& SortedArray,
+	FTimerManager& WorldTimerManager,
 	TFunction<void()> OnFinish)
 {
-	MyTimerManager MyManager(UnsortedArray, SortedArray, OnFinish);
-	MyManager.Next();
+	MyTimerManager* MyManager = MyTimerManager::GetInstance(UnsortedArray, SortedArray, &WorldTimerManager, OnFinish);
+	MyManager->Next();
 }
 
 

@@ -14,8 +14,8 @@ T* MergeSort<T>::Sort(T* array, size_t size, TFunction<void(T*, size_t, TFunctio
 		size_t right_size = left_size;
 		if (size % 2 != 0) ++right_size;
 
-		T* left_array = Sort(&array[0], left_size);
-		T* right_array = Sort(&array[left_size], right_size);
+		T* left_array = Sort(&array[0], left_size, Process);
+		T* right_array = Sort(&array[left_size], right_size, Process);
 
 		/*std::cout << "-- merge --" << std::endl;
 		std::cout << "_left array_" << std::endl;
@@ -30,7 +30,8 @@ T* MergeSort<T>::Sort(T* array, size_t size, TFunction<void(T*, size_t, TFunctio
 		merge(left_array, right_array, right_array + right_size);
 
 
-		Process(array, size, );
+		
+		Process(array, size, [](){  });
 	}
 
 	return array;

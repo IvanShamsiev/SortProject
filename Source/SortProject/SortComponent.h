@@ -24,7 +24,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Default")
 	void StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& a);
 
-	void UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray, UPARAM(ref) TArray<ASortingBox*>& SortedArray, TFunction<void()> OnFinish);
+	void UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray,
+		UPARAM(ref) TArray<ASortingBox*>& SortedArray,
+		FTimerManager& WorldTimerManager,
+		TFunction<void()> OnFinish);
 
 protected:
 	// Called when the game starts
