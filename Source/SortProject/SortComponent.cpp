@@ -3,13 +3,14 @@
 
 #include "SortComponent.h"
 
+#include <memory>
 #include <string>
 
 #include "SortingBox.h"
-#include "BoxWrapper.h"
-#include "ModifiedSortAlgorithm/SortAlgorithm.h"
-#include "ModifiedSortAlgorithm/BubbleSort.h"
-#include "ModifiedSortAlgorithm/BubbleSort.cpp"
+#include "ComparableWrapper.h"
+#include "SortingManagement/SortingManager.h"
+#include "SortProject/ModifiedSortAlgorithm/BubbleSort.h"
+#include "SortProject/ModifiedSortAlgorithm/BubbleSort.cpp"
 
 // Sets default values for this component's properties
 USortComponent::USortComponent()
@@ -24,72 +25,47 @@ USortComponent::USortComponent()
 	//GEngine->AddOnScreenDebugMessage(1, 999.f, FColor::Red, message);
 }
 
-void USortComponent::InitArray(UPARAM(ref) TArray<ASortingBox*>& a)
+void USortComponent::StartSorting(FCompareDelegate Compare, FSwapDelegate Swap)
 {
-	ArrayForSorting = a;
+	size_t Size = ArrayForSorting.Num();
+	ComparableWrapper* Wrappers = new ComparableWrapper[Size];
+
+	for (int i = 0; i < Size; ++i)
+		Wrappers[i] = ComparableWrapper(ArrayForSorting[i]);
+	
+	UE_LOG(LogTemp, Warning, TEXT("--Before sort--"));
+	for (int i = 0; i < Size; ++i)
+		UE_LOG(LogTemp, Warning, TEXT("Array[%d] = %d"), i, *static_cast<int*>(Wrappers[i].Current->GetCompareObject()));
+
+	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::BubbleSort);
+	SortManager.Sort(Wrappers, Size);
+
+	UE_LOG(LogTemp, Warning, TEXT("--After sort--"));
+	for (int i = 0; i < Size; ++i)
+		UE_LOG(LogTemp, Warning, TEXT("Array[%d] = %d"), i, *static_cast<int*>(Wrappers[i].Current->GetCompareObject()));
+	UE_LOG(LogTemp, Warning, TEXT(""));
+
+	ShowSortingProcess(SortManager.GetResults(), Compare, Swap);
 }
 
-
-
-void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& UnsortedArray)
+void USortComponent::ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap)
 {
-	try
+	for (auto Result : Results)
 	{
-		ArrayForSorting = UnsortedArray;
-		size_t Size = UnsortedArray.Num();
-		BoxWrapper* Boxes = new BoxWrapper[Size];
-		for (int i = 0; i < Size; ++i)
-			Boxes[i] = BoxWrapper(UnsortedArray[i]);
-		
-		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- Before Sort --"));
-		for (int i = 0; i < Size; ++i)
-		{
-			auto message = FString("Array[")
-				.Append(FString::FromInt(i)).Append("] = ")
-				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
-			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
-		}
-
-		SortingManager<BoxWrapper> Manager(nullptr);
-		SortAlgorithm<BoxWrapper>* alg = new BubbleSort<BoxWrapper>(&Manager);
-		Manager.Algorithm = alg;
-		alg->Sort(Boxes, Size);
-
-		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- After Sort --"));
-		for (int i = 0; i < Size; ++i)
-		{
-			auto message = FString("Array[")
-				.Append(FString::FromInt(i)).Append("] = ")
-				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
-			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
-		}
-
-		ShowSortingProcess(Manager.GetResults());
-	}
-	catch (std::exception e)
-	{
-		auto message = FString("Exception: ").Append(e.what());
-		GEngine->AddOnScreenDebugMessage(-1, 99999.0f, FColor::Red, message);
-	}
-}
-
-void USortComponent::ShowSortingProcess(TArray<SortOperation<BoxWrapper>*>& Results)
-{
-	for (int i = 0; i < Results.Num(); ++i)
-	{
-		auto Result = Results[i];
-		//UE_LOG(LogTemp, Warning, TEXT("Result* = %d; type = %d"), Result, Result->Type);
-		SwapSortOperation<BoxWrapper>* SwapResult = nullptr;
-		CompareSortOperation<BoxWrapper>* CompareResult = nullptr;
+		SwapSortOperation<ComparableWrapper>* SwapResult = nullptr;
+		CompareSortOperation<ComparableWrapper>* CompareResult = nullptr;
 		switch (Result->Type)
 		{
 		case ESortOperationType::Swap:
-			SwapResult = static_cast<SwapSortOperation<BoxWrapper>*>(Result);
-			UE_LOG(LogTemp, Warning, TEXT("Swap(%d, %d)"), SwapResult->First.Box->BoxNumber, SwapResult->Second.Box->BoxNumber);
+			SwapResult = static_cast<SwapSortOperation<ComparableWrapper>*>(Result);
+			UE_LOG(LogTemp, Warning, TEXT("Swap(%d, %d)"), *static_cast<int*>(SwapResult->First.Current->GetCompareObject()), *static_cast<int*>(SwapResult->Second.Current->GetCompareObject()));
+			Swap.ExecuteIfBound(Cast<UObject>(SwapResult->First.Current), Cast<UObject>(SwapResult->Second.Current));
 			break;
 		case ESortOperationType::Compare:
-			CompareResult = static_cast<CompareSortOperation<BoxWrapper>*>(Result);
-			UE_LOG(LogTemp, Warning, TEXT("Compare: %d %s %d ?"), CompareResult->First.Box->BoxNumber, *CompareResult->CompareToString(), CompareResult->Second.Box->BoxNumber);
+			CompareResult = static_cast<CompareSortOperation<ComparableWrapper>*>(Result);
+			
+			UE_LOG(LogTemp, Warning, TEXT("Compare: %d %s %d ?"), *static_cast<int*>(CompareResult->First.Current->GetCompareObject()), *CompareResult->CompareToString(), *static_cast<int*>(CompareResult->Second.Current->GetCompareObject()));
+			Compare.ExecuteIfBound(Cast<UObject>(CompareResult->First.Current), Cast<UObject>(CompareResult->Second.Current), CompareResult->Compare);
 			break;
 		case ESortOperationType::None:
 			UE_LOG(LogTemp, Warning, TEXT("UNEXPECTED BEHAVIOR: Result.Type = None"));

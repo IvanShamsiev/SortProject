@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BoxWrapper.h"
+#include "ComparableWrapper.h"
+#include "EngineUtils.h"
 #include "SortAIController.h"
 #include "SortingBox.h"
 #include "Components/ActorComponent.h"
 #include "SortingManagement/SortOperation.h"
 #include "SortComponent.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FCompareDelegate, UObject*, First, UObject*, Second, ESortCompareType, CompareType);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FSwapDelegate, UObject*, First, UObject*, Second);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SORTPROJECT_API USortComponent : public UActorComponent
@@ -19,21 +22,26 @@ class SORTPROJECT_API USortComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	USortComponent();
+	
+	UFUNCTION(BlueprintCallable, Category="Default")
+	void AddComparableItem(TScriptInterface<IComparable> Item)
+	{
+		auto ComparableItem = Cast<IComparable>(Item.GetObject());
+		ArrayForSorting.Add(ComparableItem);
+	}
 
 	UFUNCTION(BlueprintCallable, Category="Default")
-	void InitArray(UPARAM(ref) TArray<ASortingBox*>& a);
+	void StartSorting(/*UPARAM(ref) TArray<TScriptInterface<IComparable>>& UnsortedArray, */FCompareDelegate Compare, FSwapDelegate Swap);
 
-	UFUNCTION(BlueprintCallable, Category="Default")
-	void StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& a);
-
-	void ShowSortingProcess(TArray<SortOperation<BoxWrapper>*>& Results);
+	//UFUNCTION(BlueprintCallable, Category="Default")
+	void ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-	TArray<ASortingBox*> ArrayForSorting;
+	TArray<IComparable*> ArrayForSorting;
 
 public:	
 	// Called every frame

@@ -11,4 +11,6 @@ public:
 	virtual T* Sort(T* array, size_t size) = 0;
 	
 	SortingManager<T>* Manager;
+	
+	virtual ~SortAlgorithm() = default;
 };

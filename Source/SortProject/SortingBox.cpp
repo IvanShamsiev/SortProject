@@ -15,7 +15,6 @@ ASortingBox::ASortingBox()
 void ASortingBox::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -23,6 +22,11 @@ void ASortingBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void* ASortingBox::GetCompareObject()
+{
+	return &BoxNumber;
 }
 
 float ASortingBox::Compare(IComparable& Other)

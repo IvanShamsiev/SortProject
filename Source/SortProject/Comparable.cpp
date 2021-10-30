@@ -3,12 +3,14 @@
 
 #include "Comparable.h"
 
-#include <memory>
-
-#include "SortingBox.h"
-
 // Add default functionality here for any IComparable functions that are not pure virtual.
 
+
+
+void* IComparable::GetCompareObject()
+{
+	return this;
+}
 
 bool IComparable::operator>(IComparable& Other)
 {

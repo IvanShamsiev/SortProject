@@ -26,7 +26,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default")
 	int BoxNumber;
-	
+
+	virtual void* GetCompareObject() override;
 	virtual float Compare(IComparable& Other) override;
 
 };

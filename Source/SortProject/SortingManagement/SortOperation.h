@@ -7,12 +7,13 @@ enum class ESortOperationType
 	Swap
 };
 
-enum class ESortCompareType
+UENUM(BlueprintType)
+enum class ESortCompareType : uint8
 {
-	MoreThan,
-	LessThan,
-	Equals,
-	NotEquals
+	MoreThan UMETA(DisplayName = "MoreThan"),
+	LessThan UMETA(DisplayName = "LessThan"),
+	Equals UMETA(DisplayName = "Equals"),
+	NotEquals UMETA(DisplayName = "NotEquals")
 };
 
 template <typename T>

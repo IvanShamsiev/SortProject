@@ -1,34 +1,64 @@
 ﻿#pragma once
 
+#include <memory>
+
 #include "SortOperation.h"
 
 template <typename T>
 class SortAlgorithm;
 
+enum class ESortAlgorithmType
+{
+	None,
+	BubbleSort
+};
+
 template <typename T>
 class SortingManager
 {
 public:
-	SortingManager(SortAlgorithm<T>* SortAlgorithm): Algorithm(SortAlgorithm), Results() { }
-	
-	SortAlgorithm<T>* Algorithm;
+	SortingManager(ESortAlgorithmType AlgorithmType) : Results()
+	{
+		SetSortAlgorithm(AlgorithmType);
+	}
+
+	T* Sort(T* Array, size_t Size)
+	{
+		return Algorithm->Sort(Array, Size);
+	}
 
 	TArray<SortOperation<T>*>& GetResults() { return Results; };
 
 	void PushCompare(T First, T Second, ESortCompareType Compare)
 	{
-		auto op = new CompareSortOperation<T>(First, Second, Compare);
-		Results.Add(op);
-		UE_LOG(LogTemp, Warning, TEXT("[PushCompare] op* = %d; Result* = %d; Type = %d"), op, Results[Results.Num()-1], op->Type);
-	};
+		Results.Add(new CompareSortOperation<T>(First, Second, Compare));
+	}
 
 	void PushSwap(T First, T Second)
 	{
-		auto op = new SwapSortOperation<T>(First, Second);
-		Results.Add(op);
-		UE_LOG(LogTemp, Warning, TEXT("[PushSwap] op* = %d; Result* = %d; Type = %d"), op, Results[Results.Num()-1], op->Type);
-	};
+		Results.Add(new SwapSortOperation<T>(First, Second));
+	}
+
+	~SortingManager()
+	{
+		for (auto Result : Results)
+			delete Result;
+	}
 
 private:
+	std::unique_ptr<SortAlgorithm<T>> Algorithm;
 	TArray<SortOperation<T>*> Results;
+
+	void SetSortAlgorithm(ESortAlgorithmType AlgorithmType)
+	{
+		switch(AlgorithmType)
+		{
+		case ESortAlgorithmType::BubbleSort:
+			Algorithm = std::unique_ptr<SortAlgorithm<T>>(new BubbleSort<T>(this));
+			break;
+		case ESortAlgorithmType::None:
+			Algorithm = nullptr;
+			break;
+		}
+	}
 };
