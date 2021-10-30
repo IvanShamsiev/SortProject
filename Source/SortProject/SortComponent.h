@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoxWrapper.h"
 #include "SortAIController.h"
 #include "SortingBox.h"
 #include "Components/ActorComponent.h"
+#include "SortingManagement/SortOperation.h"
 #include "SortComponent.generated.h"
 
 
@@ -24,10 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Default")
 	void StartSorting(ASortAIController* Controller, UPARAM(ref) TArray<ASortingBox*>& a);
 
-	void UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray,
-		UPARAM(ref) TArray<ASortingBox*>& SortedArray,
-		FTimerManager& WorldTimerManager,
-		TFunction<void()> OnFinish);
+	void ShowSortingProcess(TArray<SortOperation<BoxWrapper>*>& Results);
 
 protected:
 	// Called when the game starts

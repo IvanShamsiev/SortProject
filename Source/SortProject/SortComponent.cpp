@@ -7,10 +7,9 @@
 
 #include "SortingBox.h"
 #include "BoxWrapper.h"
-#include "MyTimerManager.h"
-#include "ModifiedSortAlgoritm/SortAlgorithm.h"
-#include "ModifiedSortAlgoritm/MergeSort.h"
-#include "ModifiedSortAlgoritm/MergeSort.cpp"
+#include "ModifiedSortAlgorithm/SortAlgorithm.h"
+#include "ModifiedSortAlgorithm/BubbleSort.h"
+#include "ModifiedSortAlgorithm/BubbleSort.cpp"
 
 // Sets default values for this component's properties
 USortComponent::USortComponent()
@@ -50,17 +49,11 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
 			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
 		}
-	
-		SortAlgorithm<BoxWrapper>* alg = new MergeSort<BoxWrapper>();
-		auto ProcessFunction = TFunction<void(BoxWrapper*, size_t, TFunction<void()>)>(
-			[this](BoxWrapper* sorted, size_t size, TFunction<void()> Proceed)
-			{
-				TArray<ASortingBox*> array;
-				for (int i = 0; i < size; ++i)
-					array.Add(sorted[i].Box);
-				UpdateSorting(this->ArrayForSorting, array, GetWorld()->GetTimerManager(), Proceed);
-			});
-		alg->Sort(Boxes, Size, ProcessFunction);
+
+		SortingManager<BoxWrapper> Manager(nullptr);
+		SortAlgorithm<BoxWrapper>* alg = new BubbleSort<BoxWrapper>(&Manager);
+		Manager.Algorithm = alg;
+		alg->Sort(Boxes, Size);
 
 		GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, FString("-- After Sort --"));
 		for (int i = 0; i < Size; ++i)
@@ -70,25 +63,40 @@ void USortComponent::StartSorting(ASortAIController* Controller, UPARAM(ref) TAr
 				.Append(FString::FromInt(Boxes[i].Box->BoxNumber));
 			GEngine->AddOnScreenDebugMessage(-1, 9999.0f, FColor::Red, message);
 		}
+
+		ShowSortingProcess(Manager.GetResults());
 	}
 	catch (std::exception e)
 	{
 		auto message = FString("Exception: ").Append(e.what());
 		GEngine->AddOnScreenDebugMessage(-1, 99999.0f, FColor::Red, message);
 	}
-	
 }
 
-
-void USortComponent::UpdateSorting(UPARAM(ref) TArray<ASortingBox*>& UnsortedArray,
-	UPARAM(ref) TArray<ASortingBox*>& SortedArray,
-	FTimerManager& WorldTimerManager,
-	TFunction<void()> OnFinish)
+void USortComponent::ShowSortingProcess(TArray<SortOperation<BoxWrapper>*>& Results)
 {
-	MyTimerManager* MyManager = MyTimerManager::GetInstance(UnsortedArray, SortedArray, &WorldTimerManager, OnFinish);
-	MyManager->Next();
+	for (int i = 0; i < Results.Num(); ++i)
+	{
+		auto Result = Results[i];
+		//UE_LOG(LogTemp, Warning, TEXT("Result* = %d; type = %d"), Result, Result->Type);
+		SwapSortOperation<BoxWrapper>* SwapResult = nullptr;
+		CompareSortOperation<BoxWrapper>* CompareResult = nullptr;
+		switch (Result->Type)
+		{
+		case ESortOperationType::Swap:
+			SwapResult = static_cast<SwapSortOperation<BoxWrapper>*>(Result);
+			UE_LOG(LogTemp, Warning, TEXT("Swap(%d, %d)"), SwapResult->First.Box->BoxNumber, SwapResult->Second.Box->BoxNumber);
+			break;
+		case ESortOperationType::Compare:
+			CompareResult = static_cast<CompareSortOperation<BoxWrapper>*>(Result);
+			UE_LOG(LogTemp, Warning, TEXT("Compare: %d %s %d ?"), CompareResult->First.Box->BoxNumber, *CompareResult->CompareToString(), CompareResult->Second.Box->BoxNumber);
+			break;
+		case ESortOperationType::None:
+			UE_LOG(LogTemp, Warning, TEXT("UNEXPECTED BEHAVIOR: Result.Type = None"));
+			break;
+		}
+	}
 }
-
 
 // Called when the game starts
 void USortComponent::BeginPlay()
