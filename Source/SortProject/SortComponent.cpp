@@ -25,13 +25,20 @@ USortComponent::USortComponent()
 	//GEngine->AddOnScreenDebugMessage(1, 999.f, FColor::Red, message);
 }
 
-void USortComponent::StartSorting(FCompareDelegate Compare, FSwapDelegate Swap)
+void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, FCompareDelegate Compare, FSwapDelegate Swap)
 {
-	size_t Size = ArrayForSorting.Num();
+	UE_LOG(LogTemp, Warning, TEXT("--Check compiled 001--"));
+	
+	TArray<IComparable*> UnsortedArray;
+	for (const auto Obj : ComparableObjects)
+		if (Obj->Implements<UComparable>())
+			UnsortedArray.Add(Cast<IComparable>(Obj));
+	
+	size_t Size = UnsortedArray.Num();
 	ComparableWrapper* Wrappers = new ComparableWrapper[Size];
 
 	for (int i = 0; i < Size; ++i)
-		Wrappers[i] = ComparableWrapper(ArrayForSorting[i]);
+		Wrappers[i] = ComparableWrapper(UnsortedArray[i]);
 	
 	UE_LOG(LogTemp, Warning, TEXT("--Before sort--"));
 	for (int i = 0; i < Size; ++i)

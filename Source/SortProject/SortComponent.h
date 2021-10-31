@@ -22,16 +22,9 @@ class SORTPROJECT_API USortComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	USortComponent();
-	
-	UFUNCTION(BlueprintCallable, Category="Default")
-	void AddComparableItem(TScriptInterface<IComparable> Item)
-	{
-		auto ComparableItem = Cast<IComparable>(Item.GetObject());
-		ArrayForSorting.Add(ComparableItem);
-	}
 
 	UFUNCTION(BlueprintCallable, Category="Default")
-	void StartSorting(/*UPARAM(ref) TArray<TScriptInterface<IComparable>>& UnsortedArray, */FCompareDelegate Compare, FSwapDelegate Swap);
+	void StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, FCompareDelegate Compare, FSwapDelegate Swap);
 
 	//UFUNCTION(BlueprintCallable, Category="Default")
 	void ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap);
