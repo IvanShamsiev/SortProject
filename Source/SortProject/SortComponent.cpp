@@ -25,9 +25,9 @@ USortComponent::USortComponent()
 	//GEngine->AddOnScreenDebugMessage(1, 999.f, FColor::Red, message);
 }
 
-void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, FCompareDelegate Compare, FSwapDelegate Swap)
+void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, TArray<USortOperationBP*>& ResultsBP)
 {
-	UE_LOG(LogTemp, Warning, TEXT("--Check compiled 001--"));
+	UE_LOG(LogTemp, Warning, TEXT("--Check compiled 002--"));
 	
 	TArray<IComparable*> UnsortedArray;
 	for (const auto Obj : ComparableObjects)
@@ -52,10 +52,14 @@ void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObject
 		UE_LOG(LogTemp, Warning, TEXT("Array[%d] = %d"), i, *static_cast<int*>(Wrappers[i].Current->GetCompareObject()));
 	UE_LOG(LogTemp, Warning, TEXT(""));
 
-	ShowSortingProcess(SortManager.GetResults(), Compare, Swap);
+	ResultsBP = TArray<USortOperationBP*>();
+	for (auto Result : SortManager.GetResults())
+		ResultsBP.Add(USortOperationBP::GetFromNative(Result));
+
+	//ShowSortingProcess(SortManager.GetResults(), Compare, Swap);
 }
 
-void USortComponent::ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap)
+/*void USortComponent::ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap)
 {
 	for (auto Result : Results)
 	{
@@ -63,23 +67,23 @@ void USortComponent::ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*
 		CompareSortOperation<ComparableWrapper>* CompareResult = nullptr;
 		switch (Result->Type)
 		{
-		case ESortOperationType::Swap:
+		case SortOperationType::Swap:
 			SwapResult = static_cast<SwapSortOperation<ComparableWrapper>*>(Result);
 			UE_LOG(LogTemp, Warning, TEXT("Swap(%d, %d)"), *static_cast<int*>(SwapResult->First.Current->GetCompareObject()), *static_cast<int*>(SwapResult->Second.Current->GetCompareObject()));
 			Swap.ExecuteIfBound(Cast<UObject>(SwapResult->First.Current), Cast<UObject>(SwapResult->Second.Current));
 			break;
-		case ESortOperationType::Compare:
+		case SortOperationType::Compare:
 			CompareResult = static_cast<CompareSortOperation<ComparableWrapper>*>(Result);
 			
 			UE_LOG(LogTemp, Warning, TEXT("Compare: %d %s %d ?"), *static_cast<int*>(CompareResult->First.Current->GetCompareObject()), *CompareResult->CompareToString(), *static_cast<int*>(CompareResult->Second.Current->GetCompareObject()));
 			Compare.ExecuteIfBound(Cast<UObject>(CompareResult->First.Current), Cast<UObject>(CompareResult->Second.Current), CompareResult->Compare);
 			break;
-		case ESortOperationType::None:
+		case SortOperationType::None:
 			UE_LOG(LogTemp, Warning, TEXT("UNEXPECTED BEHAVIOR: Result.Type = None"));
 			break;
 		}
 	}
-}
+}*/
 
 // Called when the game starts
 void USortComponent::BeginPlay()

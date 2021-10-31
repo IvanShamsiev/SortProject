@@ -10,7 +10,7 @@ T* BubbleSort<T>::Sort(T* array, const size_t size) {
         sorted = true;
         for (auto i = 0; i < size - 1; i++)
         {
-            this->Manager->PushCompare(array[i+1], array[i], ESortCompareType::LessThan);
+            this->Manager->PushCompare(array[i+1], array[i], SortCompareType::LessThan);
             if (array[i + 1] < array[i]) // Change this to reverse
             {
                 sorted = false;

@@ -3,16 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ComparableWrapper.h"
 #include "EngineUtils.h"
 #include "SortAIController.h"
 #include "SortingBox.h"
 #include "Components/ActorComponent.h"
-#include "SortingManagement/SortOperation.h"
+#include "SupportBP/SortOperationBP.h"
 #include "SortComponent.generated.h"
-
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FCompareDelegate, UObject*, First, UObject*, Second, ESortCompareType, CompareType);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FSwapDelegate, UObject*, First, UObject*, Second);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SORTPROJECT_API USortComponent : public UActorComponent
@@ -24,10 +20,10 @@ public:
 	USortComponent();
 
 	UFUNCTION(BlueprintCallable, Category="Default")
-	void StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, FCompareDelegate Compare, FSwapDelegate Swap);
+	void StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, TArray<USortOperationBP*>& ResultsBP);
 
 	//UFUNCTION(BlueprintCallable, Category="Default")
-	void ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results, FCompareDelegate Compare, FSwapDelegate Swap);
+	//void ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results);
 
 protected:
 	// Called when the game starts

@@ -29,7 +29,7 @@ public:
 
 	TArray<SortOperation<T>*>& GetResults() { return Results; };
 
-	void PushCompare(T First, T Second, ESortCompareType Compare)
+	void PushCompare(T First, T Second, SortCompareType Compare)
 	{
 		Results.Add(new CompareSortOperation<T>(First, Second, Compare));
 	}
