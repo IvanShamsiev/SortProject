@@ -30,13 +30,14 @@ struct CompareSortOperation: SortOperation<T>
 {
 	T First;
 	T Second;
-	SortCompareType Compare;
-	CompareSortOperation(T _First, T _Second, SortCompareType _Compare): SortOperation(SortOperationType::Compare), First(_First), Second(_Second), Compare(_Compare) { }
+	SortCompareType CompareType;
+	bool CompareSuccess;
+	CompareSortOperation(T _First, T _Second, SortCompareType _CompareType, bool _CompareSuccess): SortOperation(SortOperationType::Compare), First(_First), Second(_Second), CompareType(_CompareType), CompareSuccess(_CompareSuccess) { }
 	
 	FString CompareToString() const
 	{
 		FString Value = "";
-		switch(Compare)
+		switch(CompareType)
 		{
 		case SortCompareType::None: Value = ""; break;
 		case SortCompareType::LessThan: Value = "<"; break;

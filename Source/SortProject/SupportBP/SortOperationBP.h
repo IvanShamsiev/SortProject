@@ -47,15 +47,17 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UObject* Second;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ESortCompareTypeBP Compare;
+	ESortCompareTypeBP CompareType;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool CompareSuccess;
 	
-	UCompareSortOperationBP(): USortOperationBP(ESortOperationTypeBP::Compare), First(nullptr), Second(nullptr), Compare(ESortCompareTypeBP::None) { }
-	UCompareSortOperationBP(UObject* _First, UObject* _Second, ESortCompareTypeBP _Compare): USortOperationBP(ESortOperationTypeBP::Compare), First(_First), Second(_Second), Compare(_Compare) { }
+	UCompareSortOperationBP(): USortOperationBP(ESortOperationTypeBP::Compare), First(nullptr), Second(nullptr), CompareType(ESortCompareTypeBP::None), CompareSuccess(false) { }
+	UCompareSortOperationBP(UObject* _First, UObject* _Second, ESortCompareTypeBP _CompareType, bool _CompareSuccess): USortOperationBP(ESortOperationTypeBP::Compare), First(_First), Second(_Second), CompareType(_CompareType), CompareSuccess(_CompareSuccess) { }
 	
 	FString CompareToString() const
 	{
 		FString Value = "";
-		switch(Compare)
+		switch(CompareType)
 		{
 		case ESortCompareTypeBP::None: Value = ""; break;
 		case ESortCompareTypeBP::LessThan: Value = "<"; break;

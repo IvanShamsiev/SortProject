@@ -11,6 +11,8 @@
 #include "SortingManagement/SortingManager.h"
 #include "SortProject/ModifiedSortAlgorithm/BubbleSort.h"
 #include "SortProject/ModifiedSortAlgorithm/BubbleSort.cpp"
+#include "SortProject/ModifiedSortAlgorithm/QuickSort.h"
+#include "SortProject/ModifiedSortAlgorithm/QuickSort.cpp"
 
 // Sets default values for this component's properties
 USortComponent::USortComponent()
@@ -27,7 +29,7 @@ USortComponent::USortComponent()
 
 void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObjects, TArray<USortOperationBP*>& ResultsBP)
 {
-	UE_LOG(LogTemp, Warning, TEXT("--Check compiled 002--"));
+	UE_LOG(LogTemp, Warning, TEXT("--Check compiled 001--"));
 	
 	TArray<IComparable*> UnsortedArray;
 	for (const auto Obj : ComparableObjects)
@@ -44,7 +46,7 @@ void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObject
 	for (int i = 0; i < Size; ++i)
 		UE_LOG(LogTemp, Warning, TEXT("Array[%d] = %d"), i, *static_cast<int*>(Wrappers[i].Current->GetCompareObject()));
 
-	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::BubbleSort);
+	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::QuickSort);
 	SortManager.Sort(Wrappers, Size);
 
 	UE_LOG(LogTemp, Warning, TEXT("--After sort--"));

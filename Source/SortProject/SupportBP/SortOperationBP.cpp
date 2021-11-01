@@ -6,7 +6,7 @@ USortOperationBP* USortOperationBP::GetFromNative(SortOperation<ComparableWrappe
 	{
 		const auto CompareNative = static_cast<CompareSortOperation<ComparableWrapper>*>(Native);
 		ESortCompareTypeBP CompareType;
-		switch (CompareNative->Compare)
+		switch (CompareNative->CompareType)
 		{
 		case SortCompareType::LessThan: CompareType = ESortCompareTypeBP::LessThan; break;
 		case SortCompareType::MoreThan: CompareType = ESortCompareTypeBP::MoreThan; break;
@@ -16,7 +16,8 @@ USortOperationBP* USortOperationBP::GetFromNative(SortOperation<ComparableWrappe
 		const auto Operation = NewObject<UCompareSortOperationBP>();
 		Operation->First = Cast<UObject>(CompareNative->First.Current);
 		Operation->Second = Cast<UObject>(CompareNative->Second.Current);
-		Operation->Compare = CompareType;
+		Operation->CompareType = CompareType;
+		Operation->CompareSuccess = CompareNative->CompareSuccess;
 		return Operation;
 	}
 	if (Native->Type == SortOperationType::Swap)
