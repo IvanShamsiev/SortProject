@@ -8,7 +8,11 @@ enum class ESortOperationTypeBP : uint8
 {
 	None UMETA(DisplayName = "None"),
 	Compare UMETA(DisplayName = "Compare"),
-	Swap UMETA(DisplayName = "Swap")
+	Swap UMETA(DisplayName = "Swap"),
+	CreateTemp UMETA(DisplayName = "CreateTemp"),
+	RemoveTemp UMETA(DisplayName = "RemoveTemp"),
+	CopyToTemp UMETA(DisplayName = "CopyToTemp"),
+	CopyFromTemp UMETA(DisplayName = "CopyFromTemp")
 };
 
 UENUM(BlueprintType)
@@ -82,4 +86,66 @@ public:
 	
 	USwapSortOperationBP(): USortOperationBP(ESortOperationTypeBP::Swap), First(nullptr), Second(nullptr) { }
 	USwapSortOperationBP(UObject* _First, UObject* _Second): USortOperationBP(ESortOperationTypeBP::Swap), First(_First), Second(_Second) { }
+};
+
+UCLASS(BlueprintType)
+class UCreateTempOperation: public USortOperationBP
+{
+public:
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempId;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempSize;
+	
+	UCreateTempOperation(): USortOperationBP(ESortOperationTypeBP::CreateTemp), TempId(0), TempSize(0) { }
+	UCreateTempOperation(int _TempId, int _TempSize): USortOperationBP(ESortOperationTypeBP::CreateTemp), TempId(_TempId), TempSize(_TempSize) { }
+};
+
+UCLASS(BlueprintType)
+class URemoveTempOperation: public USortOperationBP
+{
+public:
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempId;
+	
+	URemoveTempOperation(): USortOperationBP(ESortOperationTypeBP::RemoveTemp), TempId(0) { }
+	URemoveTempOperation(int _TempId): USortOperationBP(ESortOperationTypeBP::RemoveTemp), TempId(_TempId) { }
+};
+
+UCLASS(BlueprintType)
+class UCopyToTempOperation: public USortOperationBP
+{
+public:
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UObject* Item;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempId;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempPosition;
+	
+	UCopyToTempOperation(): USortOperationBP(ESortOperationTypeBP::CopyToTemp), Item(nullptr), TempId(0), TempPosition(0) { }
+	UCopyToTempOperation(UObject* _Item, int _TempId, int _TempPosition): USortOperationBP(ESortOperationTypeBP::CopyToTemp), Item(_Item), TempId(_TempId), TempPosition(_TempPosition) { }
+};
+
+UCLASS(BlueprintType)
+class UCopyFromTempOperation: public USortOperationBP
+{
+public:
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UObject* Item;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int TempId;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int ArrayPosition;
+	
+	UCopyFromTempOperation(): USortOperationBP(ESortOperationTypeBP::CopyFromTemp), Item(nullptr), TempId(0), ArrayPosition(0) { }
+	UCopyFromTempOperation(UObject* _Item, int _TempId, int _ArrayPosition): USortOperationBP(ESortOperationTypeBP::CopyFromTemp), Item(_Item), TempId(_TempId), ArrayPosition(_ArrayPosition) { }
 };

@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "SortAIController.h"
 #include "SortingBox.h"
+#include "TempContainer.h"
 #include "Components/ActorComponent.h"
 #include "SupportBP/SortOperationBP.h"
 #include "SortComponent.generated.h"
@@ -24,6 +25,9 @@ public:
 
 	//UFUNCTION(BlueprintCallable, Category="Default")
 	//void ShowSortingProcess(TArray<SortOperation<ComparableWrapper>*>& Results);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UTempContainer* TempContainer;
 
 protected:
 	// Called when the game starts

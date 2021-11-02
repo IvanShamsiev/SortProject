@@ -4,6 +4,7 @@
 
 #include "SortOperation.h"
 #include "SortProject/ModifiedSortAlgorithm/BubbleSort.h"
+#include "SortProject/ModifiedSortAlgorithm/InsertSort.h"
 #include "SortProject/ModifiedSortAlgorithm/QuickSort.h"
 
 template <typename T>
@@ -13,7 +14,8 @@ enum class ESortAlgorithmType
 {
 	None,
 	BubbleSort,
-	QuickSort
+	QuickSort,
+	InsertSort
 };
 
 template <typename T>
@@ -42,6 +44,26 @@ public:
 		Results.Add(new SwapSortOperation<T>(First, Second));
 	}
 
+	void PushCreateTemp(unsigned int TempId, size_t TempSize)
+	{
+		Results.Add(new CreateTempOperation<T>(TempId, TempSize));
+	}
+
+	void PushRemoveTemp(unsigned int TempId)
+	{
+		Results.Add(new RemoveTempOperation<T>(TempId));
+	}
+
+	void PushCopyToTemp(T Movable, unsigned int TempId, size_t TempPosition)
+	{
+		Results.Add(new CopyToTempOperation<T>(Movable, TempId, TempPosition));
+	}
+
+	void PushCopyFromTemp(T Movable, unsigned int TempId, size_t ArrayPosition)
+	{
+		Results.Add(new CopyFromTempOperation<T>(Movable, TempId, ArrayPosition));
+	}
+
 	~SortingManager()
 	{
 		for (auto Result : Results)
@@ -61,6 +83,9 @@ private:
 			break;
 		case ESortAlgorithmType::QuickSort:
 			Algorithm = std::unique_ptr<SortAlgorithm<T>>(new QuickSort<T>(this));
+			break;
+		case ESortAlgorithmType::InsertSort:
+			Algorithm = std::unique_ptr<SortAlgorithm<T>>(new InsertSort<T>(this));
 			break;
 		case ESortAlgorithmType::None:
 			Algorithm = nullptr;

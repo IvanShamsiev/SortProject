@@ -9,6 +9,8 @@
 #include "SortProject/ModifiedSortAlgorithm/BubbleSort.cpp"
 #include "SortProject/ModifiedSortAlgorithm/QuickSort.h"
 #include "SortProject/ModifiedSortAlgorithm/QuickSort.cpp"
+#include "SortProject/ModifiedSortAlgorithm/InsertSort.h"
+#include "SortProject/ModifiedSortAlgorithm/InsertSort.cpp"
 
 USortComponent::USortComponent()
 {
@@ -30,7 +32,7 @@ void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObject
 	for (int i = 0; i < Size; ++i)
 		Wrappers[i] = ComparableWrapper(UnsortedArray[i]);
 
-	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::BubbleSort);
+	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::InsertSort);
 	SortManager.Sort(Wrappers, Size);
 
 	ResultsBP = TArray<USortOperationBP*>();

@@ -28,6 +28,39 @@ USortOperationBP* USortOperationBP::GetFromNative(SortOperation<ComparableWrappe
 		Operation->Second = Cast<UObject>(SwapNative->Second.Current);
 		return Operation;
 	}
+	if (Native->Type == SortOperationType::CreateTemp)
+	{
+		const auto CreateTempNative = static_cast<CreateTempOperation<ComparableWrapper>*>(Native);
+		const auto Operation = NewObject<UCreateTempOperation>();
+		Operation->TempId = CreateTempNative->TempId;
+		Operation->TempSize = CreateTempNative->TempSize;
+		return Operation;
+	}
+	if (Native->Type == SortOperationType::RemoveTemp)
+	{
+		const auto RemoveTempNative = static_cast<RemoveTempOperation<ComparableWrapper>*>(Native);
+		const auto Operation = NewObject<URemoveTempOperation>();
+		Operation->TempId = RemoveTempNative->TempId;
+		return Operation;
+	}
+	if (Native->Type == SortOperationType::CopyToTemp)
+	{
+		const auto CopyToTempNative = static_cast<CopyToTempOperation<ComparableWrapper>*>(Native);
+		const auto Operation = NewObject<UCopyToTempOperation>();
+		Operation->Item = Cast<UObject>(CopyToTempNative->Item.Current);
+		Operation->TempId = CopyToTempNative->TempId;
+		Operation->TempPosition = CopyToTempNative->TempPosition;
+		return Operation;
+	}
+	if (Native->Type == SortOperationType::CopyFromTemp)
+	{
+		const auto CopyFromTempNative = static_cast<CopyFromTempOperation<ComparableWrapper>*>(Native);
+		const auto Operation = NewObject<UCopyFromTempOperation>();
+		Operation->Item = Cast<UObject>(CopyFromTempNative->Item.Current);
+		Operation->TempId = CopyFromTempNative->TempId;
+		Operation->ArrayPosition = CopyFromTempNative->ArrayPosition;
+		return Operation;
+	}
 	
 	const auto Operation = NewObject<UCompareSortOperationBP>();
 	Operation->Type = ESortOperationTypeBP::None;
