@@ -10,8 +10,8 @@ T* BubbleSort<T>::Sort(T* array, const size_t size) {
         sorted = true;
         for (auto i = 0; i < size - 1; i++)
         {
-            this->Manager->PushCompare(array[i], array[i+1], SortCompareType::MoreThan, array[i] > array[i+1]); //Push
-            if (array[i] > array[i+1]) // Change this to reverse
+            this->Manager->PushCompare(array[i+1], array[i], SortCompareType::LessThan, array[i+1] < array[i]); //Push
+            if (array[i+1] < array[i]) // Change this to reverse
             {
                 sorted = false;
                 this->Manager->PushSwap(array[i], array[i+1]); //Push
@@ -20,4 +20,4 @@ T* BubbleSort<T>::Sort(T* array, const size_t size) {
         }
     }
     return array;
-};
+}

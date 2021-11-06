@@ -32,7 +32,7 @@ void USortComponent::StartSorting(UPARAM(ref) TArray<UObject*>& ComparableObject
 	for (int i = 0; i < Size; ++i)
 		Wrappers[i] = ComparableWrapper(UnsortedArray[i]);
 
-	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::InsertSort);
+	SortingManager<ComparableWrapper> SortManager(ESortAlgorithmType::BubbleSort);
 	SortManager.Sort(Wrappers, Size);
 
 	ResultsBP = TArray<USortOperationBP*>();
