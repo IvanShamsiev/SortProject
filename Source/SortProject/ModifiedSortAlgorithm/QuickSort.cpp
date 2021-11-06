@@ -6,10 +6,10 @@ T* QuickSort<T>::Sort(T* array, const size_t size)
 {
     if (size == 2)
     {
-        this->Manager->PushCompare(array[0], array[1], SortCompareType::MoreThan, array[0] > array[1]);
+        this->Manager->PushCompare(array[0], array[1], SortCompareType::MoreThan, array[0] > array[1]); //Push
         if (array[0] > array[1])
         {
-            this->Manager->PushSwap(array[0], array[1]);
+            this->Manager->PushSwap(array[0], array[1]); //Push
             std::swap(array[0], array[1]);
         }
     }
@@ -21,14 +21,14 @@ T* QuickSort<T>::Sort(T* array, const size_t size)
         std::cout << std::endl;*/
         
         size_t mid = size / 2;
-        this->Manager->PushCompare(array[0], array[mid], SortCompareType::MoreThan, array[0] > array[mid]); //Push
-        if (array[0] > array[mid])
+        this->Manager->PushCompare(array[mid], array[0], SortCompareType::LessThan, array[mid] < array[0]); //Push
+        if (array[mid] < array[0])
         {
             this->Manager->PushSwap(array[0], array[mid]); //Push
             std::swap(array[0], array[mid]);
         }
-        this->Manager->PushCompare(array[0], array[size-1], SortCompareType::MoreThan, array[0] > array[size-1]); //Push
-        if (array[0] > array[size-1])
+        this->Manager->PushCompare(array[size-1], array[0], SortCompareType::LessThan, array[size-1] < array[0]); //Push
+        if (array[size-1] < array[0])
         {
             this->Manager->PushSwap(array[0], array[size-1]); //Push
             std::swap(array[0], array[size-1]);
@@ -52,7 +52,7 @@ T* QuickSort<T>::Sort(T* array, const size_t size)
             }
             this->Manager->PushCompare(*left, *p, SortCompareType::LessThan, *left < *p); //Push
             
-            if (left == p) break;
+            if (left == p || left == p-1) break;
             this->Manager->PushSwap(*left, *(p-1)); //Push
             std::swap(*left, *(p-1));
             this->Manager->PushSwap(*(p-1), *p); //Push
